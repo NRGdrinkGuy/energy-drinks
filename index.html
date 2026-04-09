@@ -1,184 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NRGdrinkGuy • Energy Drink Orders</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 1100px;
-            margin: 30px auto;
-            padding: 20px;
-            background: #0f0f0f;
-            color: #eee;
-        }
-        h1 { color: #e60012; text-align: center; font-size: 2.6em; }
-        .container { display: flex; gap: 30px; flex-wrap: wrap; }
-        .form-section, .orders-section { background: #1a1a1a; padding: 25px; border-radius: 12px; flex: 1; min-width: 320px; }
-        label { display: block; margin: 15px 0 8px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #444; border-radius: 6px; background: #222; color: white; }
-        button { background: #e60012; color: white; border: none; padding: 14px 24px; font-size: 17px; border-radius: 8px; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #c4000f; }
-        .order-item { background: #222; padding: 15px; margin: 12px 0; border-radius: 8px; border-left: 5px solid #e60012; }
-        .done-btn { background: #28a745; margin-top: 8px; }
-        .done-btn:hover { background: #218838; }
-        #priceDisplay { font-size: 1.4em; color: #e60012; font-weight: bold; margin: 15px 0; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NRGdrinkGuy • Energy Drink Orders</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #0f0f0f;
+    color: #eee;
+}
+h1 { color: #e60012; text-align: center; font-size: 2.6em; }
+.container { display: flex; gap: 30px; flex-wrap: wrap; }
+
+.form-section, .orders-section {
+    background: #1a1a1a;
+    padding: 25px;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 320px;
+}
+
+label { display: block; margin: 15px 0 8px; font-weight: bold; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #222;
+    color: white;
+}
+
+button {
+    background: #e60012;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    font-size: 17px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover { background: #c4000f; }
+
+.order-item {
+    background: #222;
+    padding: 15px;
+    margin: 12px 0;
+    border-radius: 8px;
+    border-left: 5px solid #e60012;
+}
+
+.done-btn {
+    background: #28a745;
+    margin-top: 8px;
+}
+
+.done-btn:hover { background: #218838; }
+
+#priceDisplay {
+    font-size: 1.4em;
+    color: #e60012;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+#successMsg {
+    color: #28a745;
+    margin-top: 10px;
+    display: none;
+}
+</style>
 </head>
+
 <body>
-    <h1>NRGdrinkGuy • Energy Drink Orders</h1>
 
-    <div class="container">
-        <!-- ORDER FORM -->
-        <div class="form-section">
-            <h2>🧃 Monster Energy</h2>
+<h1>NRGdrinkGuy • Energy Drink Orders</h1>
 
-            <label>Your Name:</label>
-            <input type="text" id="name" placeholder="John Doe">
+<div class="container">
 
-            <label>Flavor:</label>
-            <select id="flavor">
-                <option value="">— Choose Flavor —</option>
-                <option>Ultra Paradise</option>
-                <option>Mango Loco</option>
-                <option>Pipeline Punch</option>
-                <option>Original Green</option>
-                <option>Zero Ultra</option>
-                <option>Raspberry</option>
-                <option>Watermelon</option>
-                <option>Pacific Punch</option>
-                <option>Khaos</option>
-                <option>Assault</option>
-                <option>Ultra Wild Passion</option>
-                <option>Bad Apple</option>
-                <option>Ultra Vice Guava</option>
-                <option>Strawberry</option>
-            </select>
+<!-- ORDER FORM -->
+<div class="form-section">
+    <h2>🧃 Monster Energy</h2>
 
-            <label>How many cans?</label>
-            <input type="number" id="quantity" min="1" value="1">
-            <p id="priceDisplay">Total for Monsters: $3.00</p>
+    <label>Your Name:</label>
+    <input type="text" id="name" placeholder="John Doe">
 
-            <h2>🥤 Other Drinks</h2>
-            <input id="otherDrink" placeholder="Red Bull, Celsius, etc.">
-            <input type="number" id="otherQty" min="1" value="1">
-            <textarea id="notes" placeholder="Notes / max price"></textarea>
+    <label>Flavor:</label>
+    <select id="flavor">
+        <option value="">— Choose Flavor —</option>
+        <option>Ultra Paradise</option>
+        <option>Mango Loco</option>
+        <option>Pipeline Punch</option>
+        <option>Original Green</option>
+        <option>Zero Ultra</option>
+        <option>Raspberry</option>
+        <option>Watermelon</option>
+        <option>Pacific Punch</option>
+        <option>Khaos</option>
+        <option>Assault</option>
+        <option>Ultra Wild Passion</option>
+        <option>Bad Apple</option>
+        <option>Ultra Vice Guava</option>
+        <option>Strawberry</option>
+    </select>
 
-            <button onclick="submitOrder()">Submit Order</button>
-        </div>
+    <label>How many cans?</label>
+    <input type="number" id="quantity" min="1" value="1">
+    <p id="priceDisplay">Total for Monsters: $3.00</p>
 
-        <!-- ORDERS LIST -->
-        <div class="orders-section">
-            <h2>📋 Orders</h2>
-            <p><strong>Pending:</strong> <span id="totalOrders">0</span></p>
-            <div id="ordersList"></div>
-        </div>
-    </div>
+    <h2>🥤 Other Drinks</h2>
+    <input id="otherDrink" placeholder="Red Bull, Celsius, etc.">
+    <input type="number" id="otherQty" min="1" value="1">
+    <textarea id="notes" placeholder="Notes / max price"></textarea>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { 
-            getFirestore, collection, addDoc, 
-            onSnapshot, deleteDoc, doc 
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    <button onclick="submitOrder()">Submit Order</button>
+    <p id="successMsg">✅ Order submitted!</p>
+</div>
 
-        // FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyBfsnDlKJU_0SWbUi3e0zD02KmMz3h81cs",
-            authDomain: "nrgdrinkguy.firebaseapp.com",
-            projectId: "nrgdrinkguy",
-        };
+<!-- ORDERS LIST -->
+<div class="orders-section">
+    <h2>📋 Orders</h2>
+    <p><strong>Pending:</strong> <span id="totalOrders">0</span></p>
+    <p><strong>Total Monsters Needed:</strong> <span id="totalCans">0</span></p>
+    <div id="ordersList"></div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+</div>
 
-        // ADMIN PASSWORD
-        const adminPassword = "M0nNRG!26"; // change this!
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // PRICE CALC
-        function updatePrice() {
-            const qty = parseInt(document.getElementById('quantity').value) || 1;
-            let total = qty === 1 ? 3 : qty === 2 ? 5 : 3 + (qty - 1) * 2.5;
-            document.getElementById('priceDisplay').textContent = `Total for Monsters: $${total.toFixed(2)}`;
+const firebaseConfig = {
+    apiKey: "AIzaSyBfsnDlKJU_0SWbUi3e0zD02KmMz3h81cs",
+    authDomain: "nrgdrinkguy.firebaseapp.com",
+    projectId: "nrgdrinkguy",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// CHANGE THIS BEFORE YOU PUBLISH
+const adminPassword = "M0nNRG!26";
+
+// PRICE CALC
+function calculatePrice(qty) {
+    return Math.floor(qty / 2) * 5 + (qty % 2) * 3;
+}
+
+function updatePrice() {
+    const qty = parseInt(document.getElementById('quantity').value) || 1;
+    const total = calculatePrice(qty);
+    document.getElementById('priceDisplay').textContent =
+        `Total for Monsters: $${total.toFixed(2)}`;
+}
+
+document.getElementById('quantity').addEventListener('input', updatePrice);
+updatePrice();
+
+// SUBMIT
+window.submitOrder = async function () {
+    const name = document.getElementById('name').value.trim() || "Anonymous";
+    const flavor = document.getElementById('flavor').value.trim();
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
+
+    const otherDrink = document.getElementById('otherDrink').value.trim();
+    const otherQty = parseInt(document.getElementById('otherQty').value) || 1;
+    const notes = document.getElementById('notes').value.trim();
+
+    if (!flavor && !otherDrink) {
+        alert("Select a drink or enter another.");
+        return;
+    }
+
+    const total = flavor ? calculatePrice(quantity) : null;
+
+    await addDoc(collection(db, "orders"), {
+        name,
+        flavor: flavor || null,
+        quantity: flavor ? quantity : null,
+        total,
+        otherDrink: otherDrink || null,
+        otherQty: otherDrink ? otherQty : null,
+        notes: notes || null,
+        timestamp: Date.now()
+    });
+
+    document.getElementById('successMsg').style.display = 'block';
+    setTimeout(() => {
+        document.getElementById('successMsg').style.display = 'none';
+    }, 2000);
+
+    document.getElementById('name').value = '';
+    document.getElementById('flavor').value = '';
+    document.getElementById('quantity').value = 1;
+    document.getElementById('otherDrink').value = '';
+    document.getElementById('otherQty').value = 1;
+    document.getElementById('notes').value = '';
+
+    updatePrice();
+};
+
+// LIVE ORDERS
+const ordersRef = collection(db, "orders");
+
+onSnapshot(ordersRef, (snapshot) => {
+    const list = document.getElementById('ordersList');
+    list.innerHTML = '';
+
+    let count = 0;
+    let totalCans = 0;
+
+    snapshot.docs
+    .sort((a, b) => a.data().timestamp - b.data().timestamp)
+    .forEach((docSnap) => {
+
+        const order = docSnap.data();
+        const id = docSnap.id;
+
+        const div = document.createElement('div');
+        div.className = 'order-item';
+
+        let content = `<strong>${order.name}</strong><br>`;
+
+        if (order.flavor) {
+            content += `<strong>${order.flavor} × ${order.quantity}</strong><br>`;
+            content += `Total: $${order.total}<br>`;
+            totalCans += order.quantity;
         }
-        document.getElementById('quantity').addEventListener('input', updatePrice);
-        updatePrice();
 
-        // SUBMIT ORDER
-        window.submitOrder = async function () {
-            const name = document.getElementById('name').value.trim() || "Anonymous";
-            const flavor = document.getElementById('flavor').value.trim();
-            const quantity = parseInt(document.getElementById('quantity').value) || 1;
-            const otherDrink = document.getElementById('otherDrink').value.trim();
-            const otherQty = parseInt(document.getElementById('otherQty').value) || 1;
-            const notes = document.getElementById('notes').value.trim();
+        if (order.otherDrink) {
+            content += `<strong>${order.otherDrink} × ${order.otherQty}</strong><br>`;
+        }
 
-            if (!flavor && !otherDrink) {
-                alert("Please select a drink or enter another one.");
-                return;
-            }
+        if (order.notes) {
+            content += `Notes: ${order.notes}<br>`;
+        }
 
-            await addDoc(collection(db, "orders"), {
-                name: name,
-                flavor: flavor || null,
-                quantity: flavor ? quantity : null,
-                otherDrink: otherDrink || null,
-                otherQty: otherDrink ? otherQty : null,
-                notes: notes || null,
-                timestamp: Date.now()
-            });
+        div.innerHTML = `
+            ${content}
+            <small>${new Date(order.timestamp).toLocaleString()}</small><br>
+            <button class="done-btn" onclick="markDone('${id}')">✅ Done</button>
+        `;
 
-            alert("✅ Order saved!");
+        list.appendChild(div);
+        count++;
+    });
 
-            document.getElementById('name').value = '';
-            document.getElementById('flavor').value = '';
-            document.getElementById('quantity').value = 1;
-            document.getElementById('otherDrink').value = '';
-            document.getElementById('otherQty').value = 1;
-            document.getElementById('notes').value = '';
-            updatePrice();
-        };
+    document.getElementById('totalOrders').textContent = count;
+    document.getElementById('totalCans').textContent = totalCans;
+});
 
-        // REAL-TIME ORDERS LIST
-        const ordersRef = collection(db, "orders");
+// DELETE
+window.markDone = async function(id) {
+    const pwd = prompt("Enter admin password:");
+    if (pwd !== adminPassword) return alert("Wrong password");
+    await deleteDoc(doc(db, "orders", id));
+};
+</script>
 
-        onSnapshot(ordersRef, (snapshot) => {
-            const list = document.getElementById('ordersList');
-            list.innerHTML = '';
-            let count = 0;
-
-            snapshot.forEach((docSnap) => {
-                const order = docSnap.data();
-                const id = docSnap.id;
-
-                const div = document.createElement('div');
-                div.className = 'order-item';
-
-                let content = `<strong>${order.name}</strong><br>`;
-                if (order.flavor) content += `<strong>${order.flavor} × ${order.quantity}</strong><br>`;
-                if (order.otherDrink) content += `<strong>${order.otherDrink} × ${order.otherQty}</strong><br>`;
-                if (order.notes) content += `Notes: ${order.notes}<br>`;
-
-                div.innerHTML = `
-                    ${content}
-                    <small>${new Date(order.timestamp).toLocaleString()}</small><br>
-                    <button class="done-btn" onclick="markDone('${id}')">✅ Done</button>
-                `;
-
-                list.appendChild(div);
-                count++;
-            });
-
-            document.getElementById('totalOrders').textContent = count;
-        });
-
-        // DELETE ORDER (admin-only)
-        window.markDone = async function(id) {
-            const pwd = prompt("Enter admin password:");
-            if (pwd !== adminPassword) return alert("❌ Wrong password!");
-            await deleteDoc(doc(db, "orders", id));
-        };
-    </script>
 </body>
 </html>
