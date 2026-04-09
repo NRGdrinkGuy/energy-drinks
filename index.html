@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wyatt's Energy Drinks • School Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f8f8f8;
+            color: #222;
+        }
+        h1 { color: #e60012; text-align: center; }
+        h2 { color: #333; margin-top: 30px; }
+        form {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin: 15px 0 6px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #e60012;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { background: #c4000f; }
+        #priceDisplay {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #e60012;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wyatt's Energy Drink Orders</h1>
+    <p style="text-align:center;">Submit your requests — I'll bring them to school!</p>
+
+    <form id="orderForm">
+        <h2>🧃 Monster Energy</h2>
+        
+        <label for="flavor">Flavor:</label>
+        <select id="flavor" required>
+            <option value="">— Choose a flavor —</option>
+            <option value="Ultra Paradise">Ultra Paradise</option>
+            <option value="Mango Loco">Mango Loco</option>
+            <option value="Pipeline Punch">Pipeline Punch</option>
+            <option value="Original Green">Original Green</option>
+            <option value="Zero Ultra">Zero Ultra</option>
+            <option value="Raspberry">Raspberry</option>
+            <option value="Watermelon">Watermelon</option>
+            <!-- Add more flavors if you sell them -->
+        </select>
+
+        <label for="quantity">How many cans?</label>
+        <input type="number" id="quantity" min="1" value="1" required>
+
+        <p id="priceDisplay">Total: $3.00</p>
+
+        <h2>🥤 Other Energy Drinks</h2>
+        <label for="otherDrink">Drink name (e.g. Red Bull 8.4oz, Celsius, Prime, etc.)</label>
+        <input type="text" id="otherDrink" placeholder="Red Bull Blue Edition">
+
+        <label for="otherQty">Quantity</label>
+        <input type="number" id="otherQty" min="1" value="1">
+
+        <label for="notes">Notes / Starting price you're okay with</label>
+        <textarea id="notes" rows="2" placeholder="e.g. Max $4 each"></textarea>
+
+        <button type="submit">Submit My Order</button>
+    </form>
+
+    <script>
+        const qtyInput = document.getElementById('quantity');
+        const priceDisplay = document.getElementById('priceDisplay');
+
+        function updatePrice() {
+            let qty = parseInt(qtyInput.value) || 1;
+            let total = 0;
+            
+            if (qty === 1) total = 3;
+            else if (qty === 2) total = 5;
+            else total = 3 + (qty - 1) * 2.5;   // simple bulk pricing
+
+            priceDisplay.textContent = `Total for Monsters: $${total.toFixed(2)}`;
+        }
+
+        qtyInput.addEventListener('input', updatePrice);
+        updatePrice(); // run once when page loads
+
+        // Handle form submission (for now just shows a message)
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const flavor = document.getElementById('flavor').value;
+            const qty = document.getElementById('quantity').value;
+            const other = document.getElementById('otherDrink').value;
+            const otherQty = document.getElementById('otherQty').value;
+            const notes = document.getElementById('notes').value;
+
+            let message = "✅ Order submitted!\n\n";
+            if (flavor) message += `Monster: ${flavor} × ${qty}\n`;
+            if (other) message += `Other: ${other} × ${otherQty}\n`;
+            if (notes) message += `Notes: ${notes}\n`;
+
+            alert(message + "\n\nI'll add this to my list. Thanks!");
+            
+            // Clear the form after submit
+            document.getElementById('orderForm').reset();
+            updatePrice();
+        });
+    </script>
+</body>
+</html>
