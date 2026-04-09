@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 30px auto;
             padding: 20px;
             background: #0f0f0f;
@@ -16,7 +16,7 @@
         h1 {
             color: #e60012;
             text-align: center;
-            font-size: 2.5em;
+            font-size: 2.6em;
         }
         .container {
             display: flex;
@@ -28,7 +28,7 @@
             padding: 25px;
             border-radius: 12px;
             flex: 1;
-            min-width: 300px;
+            min-width: 320px;
         }
         label {
             display: block;
@@ -58,7 +58,7 @@
         .order-item {
             background: #222;
             padding: 15px;
-            margin: 10px 0;
+            margin: 12px 0;
             border-radius: 8px;
             border-left: 5px solid #e60012;
         }
@@ -73,19 +73,20 @@
             font-weight: bold;
             margin: 15px 0;
         }
+        .success { color: #28a745; font-weight: bold; }
     </style>
 </head>
 <body>
     <h1>NRGdrinkGuy • Energy Drink Orders</h1>
-    <p style="text-align:center; color:#aaa;">Submit your requests — I'll bring them to school!</p>
+    <p style="text-align:center; color:#aaa;">Submit what you want — I'll buy and bring them to school!</p>
 
     <div class="container">
         <!-- Order Form -->
         <div class="form-section">
-            <h2>🧃 Order Monster Energy</h2>
+            <h2>🧃 Monster Energy</h2>
             
             <label>Flavor:</label>
-            <select id="flavor" required>
+            <select id="flavor">
                 <option value="">— Choose Flavor —</option>
                 <option value="Ultra Paradise">Ultra Paradise</option>
                 <option value="Mango Loco">Mango Loco</option>
@@ -100,29 +101,32 @@
             </select>
 
             <label>How many cans?</label>
-            <input type="number" id="quantity" min="1" value="1" required>
+            <input type="number" id="quantity" min="1" value="1">
 
-            <p id="priceDisplay">Total: $3.00</p>
+            <p id="priceDisplay">Total for Monsters: $3.00</p>
 
             <h2>🥤 Other Energy Drinks</h2>
-            <label>Drink name (e.g. Red Bull, Celsius, Prime...)</label>
-            <input type="text" id="otherDrink" placeholder="Red Bull Blue Edition 8.4oz">
+            <label>Drink name (e.g. Red Bull 8.4oz, Celsius Vibe, Prime, etc.)</label>
+            <input type="text" id="otherDrink" placeholder="Red Bull Blue Edition">
 
             <label>Quantity</label>
             <input type="number" id="otherQty" min="1" value="1">
 
-            <label>Notes / Max price you're okay paying</label>
-            <textarea id="notes" rows="2" placeholder="e.g. Max $4 each"></textarea>
+            <label>Notes / Max price you're okay with</label>
+            <textarea id="notes" rows="2" placeholder="e.g. Max $4 each or whatever"></textarea>
 
-            <button onclick="submitOrder()">Submit Order</button>
+            <button onclick="submitOrder()">Submit This Order</button>
         </div>
 
-        <!-- Your Orders List (Admin View) -->
+        <!-- Your Private Orders List -->
         <div class="orders-section">
-            <h2>📋 Current Orders (For Wyatt)</h2>
-            <p><strong>Total pending today:</strong> <span id="totalOrders">0</span></p>
+            <h2>📋 Current Orders (Only you can see this)</h2>
+            <p><strong>Pending orders:</strong> <span id="totalOrders">0</span></p>
             <div id="ordersList"></div>
-            <button onclick="clearAllOrders()" style="background:#dc3545; margin-top:15px;">Clear All Orders</button>
+            
+            <button onclick="clearAllOrders()" style="background:#dc3545; margin-top:20px;">
+                Clear All Orders
+            </button>
         </div>
     </div>
 
@@ -131,84 +135,98 @@
 
         function updatePrice() {
             const qty = parseInt(document.getElementById('quantity').value) || 1;
-            let total = 0;
-            if (qty === 1) total = 3;
-            else if (qty === 2) total = 5;
-            else total = 3 + (qty - 1) * 2.5;
+            let total = qty === 1 ? 3 : qty === 2 ? 5 : 3 + (qty - 1) * 2.5;
             document.getElementById('priceDisplay').textContent = `Total for Monsters: $${total.toFixed(2)}`;
         }
 
         function renderOrders() {
             const list = document.getElementById('ordersList');
             list.innerHTML = '';
+            
+            if (orders.length === 0) {
+                list.innerHTML = '<p style="color:#888;">No orders yet...</p>';
+                document.getElementById('totalOrders').textContent = 0;
+                return;
+            }
+
             orders.forEach((order, index) => {
                 const div = document.createElement('div');
                 div.className = 'order-item';
+                
+                let content = '';
+                if (order.flavor) {
+                    content += `<strong>Monster ${order.flavor} × ${order.quantity}</strong><br>`;
+                }
+                if (order.otherDrink) {
+                    content += `<strong>${order.otherDrink} × ${order.otherQty}</strong><br>`;
+                }
+                if (order.notes) content += `Notes: ${order.notes}<br>`;
+                
                 div.innerHTML = `
-                    <strong>${order.flavor ? order.flavor + ' × ' + order.quantity : order.otherDrink + ' × ' + order.otherQty}</strong><br>
-                    ${order.notes ? 'Notes: ' + order.notes + '<br>' : ''}
+                    ${content}
                     <small>${new Date(order.timestamp).toLocaleString()}</small><br>
                     <button class="done-btn" onclick="markDone(${index})">✅ Mark as Bought & Delivered</button>
                 `;
                 list.appendChild(div);
             });
+            
             document.getElementById('totalOrders').textContent = orders.length;
         }
 
-        function submitOrder() {
-            const flavor = document.getElementById('flavor').value;
-            const quantity = document.getElementById('quantity').value;
+        window.submitOrder = function() {
+            const flavor = document.getElementById('flavor').value.trim();
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
             const otherDrink = document.getElementById('otherDrink').value.trim();
-            const otherQty = document.getElementById('otherQty').value;
+            const otherQty = parseInt(document.getElementById('otherQty').value) || 1;
             const notes = document.getElementById('notes').value.trim();
 
+            // Only save if at least one thing is ordered
             if (!flavor && !otherDrink) {
-                alert("Please choose a Monster flavor or enter another drink.");
+                alert("Please select a Monster flavor or enter another energy drink.");
                 return;
             }
 
             const newOrder = {
-                flavor: flavor,
-                quantity: quantity,
-                otherDrink: otherDrink,
-                otherQty: otherQty,
-                notes: notes,
+                flavor: flavor || null,
+                quantity: flavor ? quantity : null,
+                otherDrink: otherDrink || null,
+                otherQty: otherDrink ? otherQty : null,
+                notes: notes || null,
                 timestamp: Date.now()
             };
 
             orders.push(newOrder);
             localStorage.setItem('energyOrders', JSON.stringify(orders));
 
-            alert("✅ Order added to your list!");
+            alert("✅ Order saved successfully!");
             renderOrders();
 
-            // Clear the form
-            document.getElementById('orderForm') ? document.getElementById('orderForm').reset() : null;
+            // Clear form
             document.getElementById('flavor').value = '';
-            document.getElementById('otherDrink').value = '';
-            document.getElementById('notes').value = '';
             document.getElementById('quantity').value = 1;
+            document.getElementById('otherDrink').value = '';
             document.getElementById('otherQty').value = 1;
+            document.getElementById('notes').value = '';
             updatePrice();
-        }
+        };
 
-        function markDone(index) {
-            if (confirm("Mark this order as done?")) {
+        window.markDone = function(index) {
+            if (confirm("Mark this order as done and remove it?")) {
                 orders.splice(index, 1);
                 localStorage.setItem('energyOrders', JSON.stringify(orders));
                 renderOrders();
             }
-        }
+        };
 
-        function clearAllOrders() {
-            if (confirm("Clear ALL orders? This cannot be undone.")) {
+        window.clearAllOrders = function() {
+            if (confirm("Delete ALL pending orders?")) {
                 orders = [];
                 localStorage.setItem('energyOrders', JSON.stringify(orders));
                 renderOrders();
             }
-        }
+        };
 
-        // Initialize
+        // Initialize everything
         document.getElementById('quantity').addEventListener('input', updatePrice);
         updatePrice();
         renderOrders();
