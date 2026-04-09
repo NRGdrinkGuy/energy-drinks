@@ -14,7 +14,8 @@ body {
     background: #0f0f0f;
     color: #eee;
 }
-h1 { color: #e60012; text-align: center; font-size: 2.6em; }
+h1 { color: #e60012; text-align: center; }
+
 .container { display: flex; gap: 30px; flex-wrap: wrap; }
 
 .form-section, .orders-section {
@@ -41,7 +42,7 @@ button {
     background: #e60012;
     color: white;
     border: none;
-    padding: 14px 24px;
+    padding: 14px;
     font-size: 17px;
     border-radius: 8px;
     cursor: pointer;
@@ -63,18 +64,15 @@ button:hover { background: #c4000f; }
     margin-top: 8px;
 }
 
-.done-btn:hover { background: #218838; }
-
 #priceDisplay {
-    font-size: 1.4em;
+    font-size: 1.3em;
     color: #e60012;
     font-weight: bold;
-    margin: 15px 0;
+    margin: 10px 0;
 }
 
 #successMsg {
     color: #28a745;
-    margin-top: 10px;
     display: none;
 }
 </style>
@@ -86,12 +84,11 @@ button:hover { background: #c4000f; }
 
 <div class="container">
 
-<!-- ORDER FORM -->
 <div class="form-section">
     <h2>🧃 Monster Energy</h2>
 
     <label>Your Name:</label>
-    <input type="text" id="name" placeholder="John Doe">
+    <input type="text" id="name" maxlength="20" placeholder="John Doe">
 
     <label>Flavor:</label>
     <select id="flavor">
@@ -101,35 +98,25 @@ button:hover { background: #c4000f; }
         <option>Pipeline Punch</option>
         <option>Original Green</option>
         <option>Zero Ultra</option>
-        <option>Raspberry</option>
-        <option>Watermelon</option>
-        <option>Pacific Punch</option>
-        <option>Khaos</option>
-        <option>Assault</option>
-        <option>Ultra Wild Passion</option>
-        <option>Bad Apple</option>
-        <option>Ultra Vice Guava</option>
-        <option>Strawberry</option>
     </select>
 
     <label>How many cans?</label>
     <input type="number" id="quantity" min="1" value="1">
-    <p id="priceDisplay">Total for Monsters: $3.00</p>
+    <p id="priceDisplay">$3.00</p>
 
     <h2>🥤 Other Drinks</h2>
-    <input id="otherDrink" placeholder="Red Bull, Celsius, etc.">
+    <input id="otherDrink" maxlength="30" placeholder="Red Bull, Celsius, etc.">
     <input type="number" id="otherQty" min="1" value="1">
-    <textarea id="notes" placeholder="Notes / max price"></textarea>
+    <textarea id="notes" maxlength="100" placeholder="Notes (max 100 chars)"></textarea>
 
     <button onclick="submitOrder()">Submit Order</button>
     <p id="successMsg">✅ Order submitted!</p>
 </div>
 
-<!-- ORDERS LIST -->
 <div class="orders-section">
     <h2>📋 Orders</h2>
-    <p><strong>Pending:</strong> <span id="totalOrders">0</span></p>
-    <p><strong>Total Monsters Needed:</strong> <span id="totalCans">0</span></p>
+    <p>Pending: <span id="totalOrders">0</span></p>
+    <p>Total Monsters Needed: <span id="totalCans">0</span></p>
     <div id="ordersList"></div>
 </div>
 
@@ -139,45 +126,82 @@ button:hover { background: #c4000f; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+
+// 🔥 YOUR FIREBASE CONFIG (FILLED IN)
 const firebaseConfig = {
     apiKey: "AIzaSyBfsnDlKJU_0SWbUi3e0zD02KmMz3h81cs",
     authDomain: "nrgdrinkguy.firebaseapp.com",
-    projectId: "nrgdrinkguy",
+    projectId: "nrgdrinkguy"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// CHANGE THIS BEFORE YOU PUBLISH
+
+// 🔐 ADMIN PASSWORD
 const adminPassword = "M0nNRG!26";
 
-// PRICE CALC
+
+// 🚫 BAD WORD FILTER
+const bannedWords = [
+    "fuck","shit","bitch","ass","dick","sex","porn","nigga","nigger","slut","whore"
+];
+
+function containsBadWords(text) {
+    return bannedWords.some(w => text.toLowerCase().includes(w));
+}
+
+function isValidName(name) {
+    return /^[a-zA-Z0-9 ]{1,20}$/.test(name);
+}
+
+
+// 💰 PRICE SYSTEM
 function calculatePrice(qty) {
     return Math.floor(qty / 2) * 5 + (qty % 2) * 3;
 }
 
 function updatePrice() {
     const qty = parseInt(document.getElementById('quantity').value) || 1;
-    const total = calculatePrice(qty);
     document.getElementById('priceDisplay').textContent =
-        `Total for Monsters: $${total.toFixed(2)}`;
+        "$" + calculatePrice(qty);
 }
 
 document.getElementById('quantity').addEventListener('input', updatePrice);
 updatePrice();
 
-// SUBMIT
+
+// 🧾 SUBMIT ORDER
 window.submitOrder = async function () {
-    const name = document.getElementById('name').value.trim() || "Anonymous";
-    const flavor = document.getElementById('flavor').value.trim();
+
+    const nameInput = document.getElementById('name').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    if (nameInput && !isValidName(nameInput)) {
+        alert("Invalid name (letters/numbers only, max 20 chars)");
+        return;
+    }
+
+    if (containsBadWords(nameInput) || containsBadWords(notes)) {
+        alert("Inappropriate language not allowed");
+        return;
+    }
+
+    if (notes.length > 100) {
+        alert("Notes too long (max 100 chars)");
+        return;
+    }
+
+    const name = nameInput || "Anonymous";
+
+    const flavor = document.getElementById('flavor').value;
     const quantity = parseInt(document.getElementById('quantity').value) || 1;
 
     const otherDrink = document.getElementById('otherDrink').value.trim();
     const otherQty = parseInt(document.getElementById('otherQty').value) || 1;
-    const notes = document.getElementById('notes').value.trim();
 
     if (!flavor && !otherDrink) {
-        alert("Select a drink or enter another.");
+        alert("Select a drink");
         return;
     }
 
@@ -209,7 +233,8 @@ window.submitOrder = async function () {
     updatePrice();
 };
 
-// LIVE ORDERS
+
+// 📡 LIVE ORDERS
 const ordersRef = collection(db, "orders");
 
 onSnapshot(ordersRef, (snapshot) => {
@@ -232,13 +257,13 @@ onSnapshot(ordersRef, (snapshot) => {
         let content = `<strong>${order.name}</strong><br>`;
 
         if (order.flavor) {
-            content += `<strong>${order.flavor} × ${order.quantity}</strong><br>`;
+            content += `${order.flavor} × ${order.quantity}<br>`;
             content += `Total: $${order.total}<br>`;
             totalCans += order.quantity;
         }
 
         if (order.otherDrink) {
-            content += `<strong>${order.otherDrink} × ${order.otherQty}</strong><br>`;
+            content += `${order.otherDrink} × ${order.otherQty}<br>`;
         }
 
         if (order.notes) {
@@ -247,8 +272,7 @@ onSnapshot(ordersRef, (snapshot) => {
 
         div.innerHTML = `
             ${content}
-            <small>${new Date(order.timestamp).toLocaleString()}</small><br>
-            <button class="done-btn" onclick="markDone('${id}')">✅ Done</button>
+            <button class="done-btn" onclick="markDone('${id}')">Done</button>
         `;
 
         list.appendChild(div);
@@ -259,12 +283,14 @@ onSnapshot(ordersRef, (snapshot) => {
     document.getElementById('totalCans').textContent = totalCans;
 });
 
-// DELETE
+
+// ❌ DELETE ORDER
 window.markDone = async function(id) {
-    const pwd = prompt("Enter admin password:");
+    const pwd = prompt("Password:");
     if (pwd !== adminPassword) return alert("Wrong password");
     await deleteDoc(doc(db, "orders", id));
 };
+
 </script>
 
 </body>
