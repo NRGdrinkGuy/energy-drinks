@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<style>
+body {
+    font-family: Arial;
+    max-width: 900px;
+    margin: 30px auto;
+    background: #0f0f0f;
+    color: white;
+    padding: 20px;
+}
+
+h1 { color: #e60012; text-align: center; }
+
+.order {
+    background: #1a1a1a;
+    padding: 15px;
+    margin: 10px 0;
+    border-left: 5px solid #e60012;
+    border-radius: 8px;
+}
+
+button {
+    margin-top: 8px;
+    background: #28a745;
+    border: none;
+    padding: 8px 12px;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover { background: #218838; }
+</style>
+</head>
+
+<body>
+
+<h1>🔐 Admin Dashboard</h1>
+
+<div id="orders"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBfsnDlKJU_0SWbUi3e0zD02KmMz3h81cs",
+    authDomain: "nrgdrinkguy.firebaseapp.com",
+    projectId: "nrgdrinkguy"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const ADMIN_PASSWORD = "M0nNRG!26";
+
+// 🔐 simple lock
+const pass = prompt("Enter admin password:");
+if (pass !== ADMIN_PASSWORD) {
+    document.body.innerHTML = "<h1>Access Denied</h1>";
+    throw new Error("Blocked");
+}
+
+const ordersRef = collection(db, "orders");
+
+onSnapshot(ordersRef, (snapshot) => {
+    const container = document.getElementById("orders");
+    container.innerHTML = "";
+
+    snapshot.docs
+    .sort((a, b) => a.data().timestamp - b.data().timestamp)
+    .forEach((docSnap) => {
+
+        const o = docSnap.data();
+        const id = docSnap.id;
+
+        const div = document.createElement("div");
+        div.className = "order";
+
+        div.innerHTML = `
+            <strong>${o.name}</strong><br>
+            ${o.flavor ? `${o.flavor} x${o.quantity} ($${o.total})<br>` : ""}
+            ${o.otherDrink ? `${o.otherDrink} x${o.otherQty}<br>` : ""}
+            ${o.notes ? `Notes: ${o.notes}<br>` : ""}
+            <small>${new Date(o.timestamp).toLocaleString()}</small><br>
+            <button onclick="deleteOrder('${id}')">Done</button>
+        `;
+
+        container.appendChild(div);
+    });
+});
+
+window.deleteOrder = async function(id) {
+    await deleteDoc(doc(db, "orders", id));
+};
+</script>
+
+</body>
+</html>
